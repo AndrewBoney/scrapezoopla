@@ -3,6 +3,7 @@ import pandas as pd
 import requests, json, os, re
 from datetime import datetime
 
+import bs4
 from bs4 import BeautifulSoup as soup
 
 def search_zoopla(area, page_num=1):
@@ -10,13 +11,32 @@ def search_zoopla(area, page_num=1):
     return soup(html.content, features="html.parser")
 
 def get_property_page(id_):
+    """_summary_
+
+    Args:
+        id_ (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     html = requests.get(f'https://www.zoopla.co.uk/for-sale/details/{id_}/')
     return soup(html.content, features="html.parser")    
 
-def get_property_ids(page, page_nums = -1:, verbose = False):
+def get_property_ids(search: soup, 
+                     page_start: int = 0, 
+                     page_end: int = -1, 
+                     verbose: bool = False):
+    """Get property IDs from a zoopla search page.
+
+    Args:
+        search (soup): A soup of a Zoopla property search. Can use scrape_zoopla.scrape.search_zoopla to get this. 
+        page_start (int, optional): Start page for search. Defaults to 0.
+        page_end (int, optional): End page for search. Defaults to -1 (i.e. take all).
+        verbose (bool, optional): Print messages when each page is completed. Defaults to False.
+
+    Returns:
+        list: list of property ids
     """
-    page should be zoopla search
-    """    
 
     # Get last page
     pagination = search.select("div[data-testid~=pagination]")[0]
@@ -25,7 +45,7 @@ def get_property_ids(page, page_nums = -1:, verbose = False):
     if verbose: print("Search has", len(page_nums), "pages")
 
     if page_end == -1: page_nums = page_nums[page_start:]
-    else: page_nums == page_nums[page_start:(page_end+1)] 
+    else: page_nums = page_nums[page_start:(page_end+1)] 
 
     all_ids = []
     for i in page_nums:
