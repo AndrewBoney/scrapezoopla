@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# test notebooks
+/nbs
+
+# ignore venv files, use requirements.text instead
+/Lib
+/Scripts
