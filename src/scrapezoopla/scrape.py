@@ -13,26 +13,28 @@ def get_property_page(id_):
     html = requests.get(f'https://www.zoopla.co.uk/for-sale/details/{id_}/')
     return soup(html.content, features="html.parser")    
 
-def get_property_ids(page, verbose = False):
+def get_property_ids(page, page_nums = -1:, verbose = False):
     """
     page should be zoopla search
     """    
 
     # Get last page
-    pagination = page.select("div[data-testid~=pagination]")[0]
-    last_page = pagination.find_all("li")[-2].get_text()
-    
-    if verbose: print("Search has", last_page, "pages")
-    
-    # Loop over all pages
+    pagination = search.select("div[data-testid~=pagination]")[0]
+    page_nums = [t.text for t in pagination.find_all("li") if t.text not in ["< Back", "Next >"]]
+
+    if verbose: print("Search has", len(page_nums), "pages")
+
+    if page_end == -1: page_nums = page_nums[page_start:]
+    else: page_nums == page_nums[page_start:(page_end+1)] 
+
     all_ids = []
-    for i in range(int(last_page)):
+    for i in page_nums:
         page = search_zoopla("bristol-city-centre", i)
         properties = page.select("div[data-testid*=search-result_listing]")
         ids = [p["id"][8:] for p in properties]    
         all_ids += ids
         if verbose: print("Ran page", i)
-        
+            
     return all_ids
 
 class ScriptData:
