@@ -75,7 +75,7 @@ class ScriptData:
         # Get Bedrooms. Sometimes this is missing, in which case None
         find = self.property_page.find("use", attrs = {"href": "#bedroom-medium"})
         if find is None: 
-          self.bedrooms_text, self.bedrooms_none = None, None
+          self.bedrooms_text, self.bedrooms_num = "", float("nan")
         else: 
           self.bedrooms_text = find.parent.parent.parent.get_text()
           self.bedrooms_num = int(re.findall(r"\d+", self.bedrooms_text)[0])        
@@ -88,13 +88,19 @@ class ScriptData:
 
         # Get output json
         ## First, get numeric values
-        self.price_num = int(self.price.replace("£", "").replace(",", ""))
-        
+        price_text = self.price.replace("£", "").replace(",", "")
+        try:
+            self.price_num = int(price_text)
+        except:
+            self.price_num = float("nan")
+            
         gd = self.geo.copy()
         gd.pop("@type")
         self.gd = gd
 
-        self.features_text = [t.text for t in self.property_page.select("ul[data-testid=listing_features_bulletted]")[0].find_all("li")]
+        feat_bullet = self.property_page.select("ul[data-testid=listing_features_bulletted]")
+        text_bs = feat_bullet[0].find_all("li") if len(feat_bullet) > 0 else []
+        self.features_text = [t.text for t in text_bs]
 
         text_all = list(self.property_page.select("div[data-testid=truncated_text_container]")[0].find("span").descendants)
         self.description_text = []
@@ -104,7 +110,8 @@ class ScriptData:
             else: raise TypeError("Type not supported. Should be bs4.element.Tag or bs4.element.NavigableString")
 
         try:
-          self.out_dict = {"bedrooms": self.bedrooms_num,
+            self.out_dict = {"bedrooms_num": self.bedrooms_num,
+                            "bedrooms_text": self.bedrooms_text,
                           "latitude": self.gd["latitude"],
                           "longitude": self.gd["longitude"], 
                           "features": self.features_text,
@@ -113,7 +120,8 @@ class ScriptData:
                           "price": self.price_num, 
                           "extract_time": datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
         except:
-          pass
+            raise ValueError("Failed. This is likely due to missing data")
+
 
     def process_json(self, json_data):
         json_str = json_data.text
