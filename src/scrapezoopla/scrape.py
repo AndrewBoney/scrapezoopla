@@ -1,5 +1,4 @@
 import pandas as pd
-# import imageio as iio
 import requests, json, os, re
 from datetime import datetime
 
@@ -22,7 +21,7 @@ def get_property_page(id_):
     html = requests.get(f'https://www.zoopla.co.uk/for-sale/details/{id_}/')
     return soup(html.content, features="html.parser")    
 
-def get_property_ids(search: soup, 
+def get_property_ids(search_term: str, 
                      page_start: int = 0, 
                      page_end: int = -1, 
                      verbose: bool = False):
@@ -38,6 +37,8 @@ def get_property_ids(search: soup,
         list: list of property ids
     """
 
+    search = search_zoopla(search_term)
+
     # Get last page
     pagination = search.select("div[data-testid~=pagination]")[0]
     page_nums = [t.text for t in pagination.find_all("li") if t.text not in ["< Back", "Next >"]]
@@ -49,7 +50,7 @@ def get_property_ids(search: soup,
 
     all_ids = []
     for i in page_nums:
-        page = search_zoopla("bristol-city-centre", i)
+        page = search_zoopla(search_term, i)
         properties = page.select("div[data-testid*=search-result_listing]")
         ids = [p["id"][8:] for p in properties]    
         all_ids += ids

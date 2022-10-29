@@ -1,7 +1,8 @@
-import json, os, datetime, boto3
+import json, os, boto3
 import pandas as pd
 
 from scrapezoopla.scrape import search_zoopla, get_property_ids, ScriptData
+from datetime import datetime
 
 """
 Need to formalise docs for this. 
