@@ -134,3 +134,4 @@ dmypy.json
 # ignore venv files, use requirements.text instead
 /Lib
 /Scripts
+/data
