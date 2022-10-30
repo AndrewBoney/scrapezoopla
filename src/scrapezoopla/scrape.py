@@ -40,8 +40,10 @@ def get_property_ids(search_term: str,
     search = search_zoopla(search_term)
 
     # Get last page
+    # TODO: error handling
     pagination = search.select("div[data-testid~=pagination]")[0]
     page_nums = [t.text for t in pagination.find_all("li") if t.text not in ["< Back", "Next >"]]
+    page_nums = list(range(1, int(page_nums[-1])+1))
 
     if verbose: print("Search has", len(page_nums), "pages")
 

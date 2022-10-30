@@ -30,8 +30,8 @@ class GetAll:
     def get_ids(self):
         """Get property ids for the search
         """
-        self.search = search_zoopla(self.search_term)
-        self.ids = get_property_ids(self.search)
+        # self.search = search_zoopla(self.search_term)
+        self.ids = get_property_ids(self.search_term)
 
     def get_data(self):
         """Get data for all properties in the search
