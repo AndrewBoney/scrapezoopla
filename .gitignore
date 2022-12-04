@@ -131,8 +131,8 @@ dmypy.json
 # test notebooks
 /nbs
 
-# ignore venv files, use requirements.text instead
-/Lib
-/Scripts
-/data
-/Include
+# ignore venv files, use requirements.txt instead
+Lib/
+Scripts/
+data/
+Include/

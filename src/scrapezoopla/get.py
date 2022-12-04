@@ -89,5 +89,51 @@ def get_latest_properties(base_path):
             data = json.load(js)
         data = {k: [v] if isinstance(v, list) else v for k, v in data.items()}
         all_data.append(data)
+    
+    return pd.DataFrame(all_data)
+
+def get_all_properties(base_path):
+    pf = os.listdir(base_path)
+
+    files = []
+    for p in pf: 
+        fs = os.listdir(os.path.join(base_path, p))
+        fs.sort(reverse = True)
+        files + os.path.join(base_path, p, fs)
+
+    all_data = []
+    for f in files:
+        with open(f) as js:
+            data = json.load(js)
+        data = {k: [v] if isinstance(v, list) else v for k, v in data.items()}
+        all_data.append(data)
 
     return pd.DataFrame(all_data)
+
+def clean_files(base_dir):
+    all_properties = os.listdir(base_dir)
+    data_files = [os.listdir(os.path.join(base_dir, p)) for p in all_properties]
+    num_data = [len(f) for f in data_files]
+
+    count = 0
+    for i, p, d in zip(num_data, all_properties, data_files):
+        d.sort(reverse=True)
+        if i > 1:
+            count += 1
+            all_data, times = [], []
+            for d_ in d:
+                with open(os.path.join(base_dir, p, d_), "r") as j: 
+                    data = json.loads(j.read())
+                times.append(data["extract_time"])
+                data.pop("extract_time")
+                all_data.append(data)
+
+            # checks if all the same. if so replace extract_time with list of extract_times
+            if equal_dicts(all_data):
+                paths = [os.path.join(base_dir, p, d_) for d_ in d]
+                for p in paths: os.remove(p)
+                out = all_data[0]
+                out["extract_time"] = times
+                json_obj = json.dumps(out)
+                with open(paths[0], "w") as w: w.write(json_obj)
+    print("change", count, "files")
