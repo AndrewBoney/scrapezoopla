@@ -110,6 +110,14 @@ def get_all_properties(base_path):
 
     return pd.DataFrame(all_data)
 
+def equal_dicts(lst):
+    ele, chk = lst[0], True
+    for item in lst:
+        if ele != item:
+            chk = False
+            break
+    return chk
+
 def clean_files(base_dir):
     all_properties = os.listdir(base_dir)
     data_files = [os.listdir(os.path.join(base_dir, p)) for p in all_properties]
